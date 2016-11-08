@@ -42,6 +42,7 @@ function format(raw) {
     }
     else if (component.types.indexOf('administrative_area_level_1') !== -1) {
       address.adminArea = component.long_name;
+      address.adminAreaCode = component.short_name;
     }
     else if (component.types.indexOf('administrative_area_level_2') !== -1) {
       address.subAdminArea = component.long_name;

@@ -15,6 +15,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class RNGeocoderModule extends ReactContextBaseJavaModule {
 
@@ -61,6 +62,26 @@ public class RNGeocoderModule extends ReactContextBaseJavaModule {
         catch (IOException e) {
             promise.reject(e);
         }
+    }
+
+    @ReactMethod
+    public void geocodeLocalizedPosition(String language, String country, ReadableMap position, Promise promise) {
+        Geocoder localizedGeocoder = getLocalizedGeocoder(language, country);
+        if (!localizedGeocoder.isPresent()) {
+            promise.reject("NOT_AVAILABLE", "Geocoder not available for this platform in requested locale");
+            return;
+        }
+        try {
+            List<Address> addresses = localizedGeocoder.getFromLocation(position.getDouble("lat"), position.getDouble("lng"), 20);
+            promise.resolve(transform(addresses));
+        } catch (IOException e) {
+            promise.reject(e);
+        }
+    }
+
+    private Geocoder getLocalizedGeocoder(String language, String country) {
+        Locale locale = new Locale(language, country);
+        return new Geocoder(getReactApplicationContext(), locale);
     }
 
     WritableArray transform(List<Address> addresses) {
